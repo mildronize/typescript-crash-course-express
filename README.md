@@ -13,3 +13,9 @@ pnpx create-nx-workspace@latest tscc --preset=ts
 nx add @nx/node
 nx g @nx/node:application api
 ```
+
+## How to create a new library
+
+```bash
+nx g @nx/node:lib core
+```
