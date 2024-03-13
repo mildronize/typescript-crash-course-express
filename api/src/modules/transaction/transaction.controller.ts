@@ -1,19 +1,17 @@
 import type { Request, Response } from 'express';
 import { TransactionRepository } from './transaction.repository';
-import autoBind from 'auto-bind';
+import { BaseController } from '@tscc/core';
 
-export class TransactionController {
+export class TransactionController extends BaseController {
   constructor(protected transactionRepository: TransactionRepository) {
-    autoBind(this);
+    super();
   }
   /**
    * Read a list of transactions
    */
-  getAll(req: Request, res: Response, next: any) {
-    console.log('TransactionController.getAll', this.transactionRepository);
+  async getAll(req: Request, res: Response) {
     return res.json({
-      // data: await this.transactionRepository.getAll(),
-      message: 'Transaction',
+      data: await this.transactionRepository.getAll(),
     });
   }
 
