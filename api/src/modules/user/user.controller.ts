@@ -18,28 +18,39 @@ export class UserController extends BaseController {
   /**
    * Read a single user
    */
-  get(req: Request, res: Response) {
-    res.json({ message: 'User' });
+  async get(req: Request, res: Response) {
+    return res.json({
+      data: await this.userRepository.get(req.params.id),
+    });
   }
 
   /**
    * Create a new user
    */
-  create(req: Request, res: Response) {
-    res.json({ message: 'User created' });
+  async create(req: Request, res: Response) {
+    return res.json({
+      data: await this.userRepository.create(req.body),
+    });
   }
 
   /**
    * Update a user
    */
-  update(req: Request, res: Response) {
-    res.json({ message: 'User updated' });
+  async update(req: Request, res: Response) {
+    return res.json({
+      data: await this.userRepository.update({
+        ...req.body,
+        id: req.params.id,
+      }),
+    });
   }
 
   /**
    * Delete a user
    */
-  delete(req: Request, res: Response) {
-    res.json({ message: 'User deleted' });
+  async delete(req: Request, res: Response) {
+    return res.json({
+      data: await this.userRepository.delete(req.params.id),
+    });
   }
 }

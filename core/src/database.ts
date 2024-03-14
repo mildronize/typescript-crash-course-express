@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import fsSync from 'fs';
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 const databasePrefix = 'data';
 
@@ -40,7 +41,10 @@ export class Database<Entity extends object & { id: string }> {
   async update(input: Entity) {
     const data = await this.readAll();
     const index = data.findIndex((item) => item.id === input.id);
-    data[index] = input;
+    data[index] = {
+      ...data[index],
+      ...input
+    } as Entity;
     await fs.writeFile(this.databasePath, JSON.stringify(data, null, 2));
   }
 
@@ -51,10 +55,13 @@ export class Database<Entity extends object & { id: string }> {
     await fs.writeFile(this.databasePath, JSON.stringify(data, null, 2));
   }
 
-  async insert(input: Entity) {
+  async insert(input: Omit<Entity, 'id'>) {
     const data = await this.readAll();
     // Add a new change
-    data.push(input);
+    data.push({
+      ...input,
+      id: uuidv4()
+    } as Entity);
     await fs.writeFile(this.databasePath, JSON.stringify(data, null, 2));
   }
 }
