@@ -1,8 +1,8 @@
-import { TransactionModel } from './transaction.model';
+import { UserModel } from './user.model';
 import { Database } from '@tscc/core';
 
-export class TransactionRepository {
-  constructor(protected db: Database<TransactionModel>) {}
+export class UserRepository {
+  constructor(protected db: Database<UserModel>) {}
 
   async getAll() {
     return this.db.readAll();
@@ -12,11 +12,11 @@ export class TransactionRepository {
     return this.db.read(id);
   }
 
-  async create(input: TransactionModel) {
+  async create(input: UserModel) {
     return this.db.insert(input);
   }
 
-  async update(input: TransactionModel) {
+  async update(input: UserModel) {
     return this.db.update(input);
   }
 

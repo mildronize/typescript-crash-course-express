@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
 import express from 'express';
-import { transactionRoutes } from './modules/transaction';
+import { userRoutes } from './modules/user';
 
 const router = express.Router();
 
-router.use('/transactions', transactionRoutes);
+router.use('/users', userRoutes);
 
 router.use('/', (req: Request, res: Response) => {
   res.json({ message: 'Home' });
