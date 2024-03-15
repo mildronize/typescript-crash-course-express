@@ -12,7 +12,7 @@ export class UserRepository {
     return this.db.read(id);
   }
 
-  async create(input: UserModel) {
+  async create(input: Omit<UserModel, 'id'>) {
     return this.db.insert(input);
   }
 

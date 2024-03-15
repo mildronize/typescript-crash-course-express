@@ -4,3 +4,4 @@ export * from './errors';
 export * from './middlewares';
 export * from './response';
 export * from './router';
+export * from './typed-route';

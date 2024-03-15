@@ -2,8 +2,9 @@ import { UserController } from './user.controller';
 import { UserRepository } from './user.repository';
 import { UserModel } from './user.model';
 import { v4 as uuidv4 } from 'uuid';
-import { Database } from '@tscc/core';
+import { Database, TypedRoute } from '@tscc/core';
 
+export const route = new TypedRoute();
 const db = new Database<UserModel>('users', {
   defaultData: [
     {
