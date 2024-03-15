@@ -3,6 +3,8 @@ import { BaseResponse } from './response';
 import { MaybePromise } from './types';
 import { Request, Response } from 'express';
 import { RequestHandler } from './router';
+import { ValidationError } from './errors';
+import { fromZodError } from 'zod-validation-error';
 
 export type TypedHandler<
   TQuery extends z.ZodTypeAny,
@@ -72,9 +74,23 @@ export class TypedRouteHandler<
 
   handler(handler: TypedHandler<RouteQuery, RouteParams, RouteBody>): HandlerMetadata {
     const invokeHandler = async (req: Request, res: Response) => {
-      const query = this.schema.query ? this.schema.query.parse(req.query) : undefined;
-      const params = this.schema.params ? this.schema.params.parse(req.params) : undefined;
-      const body = this.schema.body ? this.schema.body.parse(req.body) : undefined;
+      let message = '';
+      let query;
+      let params;
+      let body;
+      try {
+        message = 'Query';
+        query = this.schema.query ? this.schema.query.parse(req.query) : undefined;
+        message = 'Params';
+        params = this.schema.params ? this.schema.params.parse(req.params) : undefined;
+        message = 'Body';
+        body = this.schema.body ? this.schema.body.parse(req.body) : undefined;
+      } catch (error: unknown) {
+        if (error instanceof z.ZodError) {
+          const validationError = fromZodError(error);
+          throw new ValidationError(`${message} ${validationError.toString()}`);
+        }
+      }
       return handler({ query, params, body, req, res });
     };
     return {
