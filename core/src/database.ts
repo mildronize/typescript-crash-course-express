@@ -15,7 +15,7 @@ export class Database<Entity extends object & { id: string }> {
   }
 
   async init() {
-    const defaultData = this.options.defaultData ?? [];
+    const defaultData = this.options?.defaultData ?? [];
     if (!fsSync.existsSync(this.databasePath)) {
       await fs.mkdir(databasePrefix, { recursive: true });
       await fs.writeFile(

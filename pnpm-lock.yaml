@@ -64,6 +64,9 @@ devDependencies:
   '@types/jest':
     specifier: ^29.4.0
     version: 29.5.12
+  '@types/morgan':
+    specifier: ^1.9.9
+    version: 1.9.9
   '@types/node':
     specifier: ~18.16.9
     version: 18.16.20
@@ -2733,6 +2736,12 @@ packages:
 
   /@types/mime@3.0.4:
     resolution: {integrity: sha512-iJt33IQnVRkqeqC7PzBHPTC6fDlRNRW8vjrgqtScAhrmMwe8c4Eo7+fUGTa+XdWrpEgpyKWMYmi2dIwMAYRzPw==}
+    dev: true
+
+  /@types/morgan@1.9.9:
+    resolution: {integrity: sha512-iRYSDKVaC6FkGSpEVVIvrRGw0DfJMiQzIn3qr2G5B3C//AWkulhXgaBd7tS9/J79GWSYMTHGs7PfI5b3Y8m+RQ==}
+    dependencies:
+      '@types/node': 18.16.20
     dev: true
 
   /@types/node@18.16.20:
