@@ -1,7 +1,10 @@
 
 export interface BaseResponse<T = unknown> {
-  message: string;
-  success: boolean;
-  data: T;
+  message?: string;
+  /**
+   * @default true
+   */
+  success?: boolean;
+  data?: T;
   traceStack?: string;
 }

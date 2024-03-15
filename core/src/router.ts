@@ -1,5 +1,9 @@
-import type { Request, Response, NextFunction, RequestHandler } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import express from 'express';
+import { BaseResponse } from './response';
+import { MaybePromise } from './types';
+
+export type RequestHandler = (req: Request, res: Response, next: NextFunction) => MaybePromise<BaseResponse>;
 
 export const catchAsync =
   (fn: (...args: any[]) => any) =>
@@ -16,23 +20,35 @@ export class Router {
     return { handler, middlewares };
   }
 
+  private preRequest(handler: RequestHandler) {
+    const invokeHandler = async (req: Request, res: Response, next: NextFunction) => {
+      const result = await handler(req, res, next);
+      return res.send({
+        success: true,
+        message: 'Request successful',
+        ...result,
+      } satisfies BaseResponse);
+    }
+    return catchAsync(invokeHandler);
+  }
+
   get(path: string, ...handlers: RequestHandler[]) {
     const { handler, middlewares } = this.extractHandlers(handlers);
-    this.instance.route(path).get(middlewares, catchAsync(handler));
+    this.instance.route(path).get(middlewares, this.preRequest(handler));
   }
 
   post(path: string, ...handlers: RequestHandler[]) {
     const { handler, middlewares } = this.extractHandlers(handlers);
-    this.instance.route(path).post(middlewares, catchAsync(handler));
+    this.instance.route(path).post(middlewares, this.preRequest(handler));
   }
 
   put(path: string, ...handlers: RequestHandler[]) {
     const { handler, middlewares } = this.extractHandlers(handlers);
-    this.instance.route(path).put(middlewares, catchAsync(handler));
+    this.instance.route(path).put(middlewares, this.preRequest(handler));
   }
 
   delete(path: string, ...handlers: RequestHandler[]) {
     const { handler, middlewares } = this.extractHandlers(handlers);
-    this.instance.route(path).delete(middlewares, catchAsync(handler));
+    this.instance.route(path).delete(middlewares, this.preRequest(handler));
   }
 }
