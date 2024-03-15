@@ -53,15 +53,15 @@ export class Router {
 
   registerClassRoutes(classInstance: object) {
     const fields = Object.values(classInstance);
-    console.log(fields, 'methods');
     fields.forEach((field) => {
       const route = field as HandlerMetadata;
       if (route.__handlerMetadata) {
         const { path, handler } = route;
         const method = route.method.toLowerCase();
-        console.log('Registering route', method, path, handler.name);
+        console.log('Registering route', method, path);
         (this.instance.route(path) as any)[method](this.preRequest(handler));
       }
     });
+    return this;
   }
 }
