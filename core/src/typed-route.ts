@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { BaseResponse } from './response';
 import { MaybePromise } from './types';
 import { Request, Response } from 'express';
+import { RequestHandler } from './router';
 
 export type TypedHandler<
   TQuery extends z.ZodTypeAny,
@@ -16,22 +17,28 @@ export type TypedHandler<
   res: Response<TResponse>;
 }) => MaybePromise<TResponse>;
 
-export class TypedRoute {
+export interface HandlerMetadata {
+  __handlerMetadata: true;
+  method: string;
+  path: string;
+  handler: RequestHandler;
+}
 
+export class TypedRoute {
   get(path: string) {
-    return new TypedRouteHandler(path);
+    return new TypedRouteHandler(path, 'get');
   }
 
   post(path: string) {
-    return new TypedRouteHandler(path);
+    return new TypedRouteHandler(path, 'post');
   }
 
   put(path: string) {
-    return new TypedRouteHandler(path);
+    return new TypedRouteHandler(path, 'put');
   }
 
   delete(path: string) {
-    return new TypedRouteHandler(path);
+    return new TypedRouteHandler(path, 'delete');
   }
 }
 
@@ -46,7 +53,7 @@ export class TypedRouteHandler<
     body?: z.ZodTypeAny;
   } = {};
 
-  constructor(public readonly path: string) {}
+  constructor(public readonly path: string, public readonly method: string) {}
 
   query<Query extends z.ZodTypeAny>(schema: Query) {
     this.schema.query = schema;
@@ -63,16 +70,18 @@ export class TypedRouteHandler<
     return this as unknown as TypedRouteHandler<RouteQuery, RouteParams, Body>;
   }
 
-  handler(handler: TypedHandler<RouteQuery, RouteParams, RouteBody>) {
+  handler(handler: TypedHandler<RouteQuery, RouteParams, RouteBody>): HandlerMetadata {
     const invokeHandler = async (req: Request, res: Response) => {
       const query = this.schema.query ? this.schema.query.parse(req.query) : undefined;
       const params = this.schema.params ? this.schema.params.parse(req.params) : undefined;
       const body = this.schema.body ? this.schema.body.parse(req.body) : undefined;
       return handler({ query, params, body, req, res });
-    }
+    };
     return {
+      method: this.method,
       path: this.path,
       handler: invokeHandler,
+      __handlerMetadata: true,
     };
   }
 }

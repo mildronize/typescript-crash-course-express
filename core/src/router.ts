@@ -2,14 +2,13 @@ import type { Request, Response, NextFunction } from 'express';
 import express from 'express';
 import { BaseResponse } from './response';
 import { MaybePromise } from './types';
+import { HandlerMetadata } from './typed-route';
 
 export type RequestHandler = (req: Request, res: Response, next: NextFunction) => MaybePromise<BaseResponse>;
 
-export const catchAsync =
-  (fn: (...args: any[]) => any) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch((err) => next(err));
-  };
+export const catchAsync = (fn: (...args: any[]) => any) => (req: Request, res: Response, next: NextFunction) => {
+  Promise.resolve(fn(req, res, next)).catch((err) => next(err));
+};
 
 export class Router {
   constructor(public readonly instance: express.Router = express.Router()) {}
@@ -28,7 +27,7 @@ export class Router {
         message: 'Request successful',
         ...result,
       } satisfies BaseResponse);
-    }
+    };
     return catchAsync(invokeHandler);
   }
 
@@ -50,5 +49,19 @@ export class Router {
   delete(path: string, ...handlers: RequestHandler[]) {
     const { handler, middlewares } = this.extractHandlers(handlers);
     this.instance.route(path).delete(middlewares, this.preRequest(handler));
+  }
+
+  registerClassRoutes(classInstance: object) {
+    const fields = Object.values(classInstance);
+    console.log(fields, 'methods');
+    fields.forEach((field) => {
+      const route = field as HandlerMetadata;
+      if (route.__handlerMetadata) {
+        const { path, handler } = route;
+        const method = route.method.toLowerCase();
+        console.log('Registering route', method, path, handler.name);
+        (this.instance.route(path) as any)[method](this.preRequest(handler));
+      }
+    });
   }
 }
